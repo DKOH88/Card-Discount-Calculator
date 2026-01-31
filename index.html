@@ -386,33 +386,10 @@
                         <span class="value" id="required-payment">0원</span>
                     </div>
                 </div>
-                <div class="result-row final">
-                    <span class="label">SK 일렉링크 충전액<br><span style="font-size: 0.85em; opacity: 0.8;">(5%
-                            선할인)</span></span>
-                    <div class="result-right-group">
-                        <button class="copy-btn special" onclick="copyToClipboard('required-payment-sk')">복사</button>
-                        <span class="value final-value" id="required-payment-sk">0원</span>
-                    </div>
-                </div>
-            </div>
 
-            <div class="divider"></div>
-
-            <div class="section-title">할인 금액 계산</div>
-
-            <div class="input-group">
-                <label for="amount">결제 금액을 입력하세요</label>
-                <div class="input-wrapper">
-                    <input type="text" id="amount" placeholder="0" inputmode="numeric">
-                </div>
-            </div>
-
-            <div class="results">
                 <div class="result-row">
                     <div style="display: flex; flex-direction: column;">
-                        <span id="max-badge" class="badge badge-max" style="margin-left: 0; margin-bottom: 0.3rem;">최대
-                            한도 도달</span>
-                        <span class="label" id="rate-label">적용 할인율 (70%)</span>
+                        <span class="label" id="rate-label">적용 할인 금액</span>
                     </div>
                     <span class="value discount-value" id="discount-amount">0원</span>
                 </div>
@@ -420,6 +397,17 @@
                 <div class="result-row final">
                     <span class="label">최종 결제 금액</span>
                     <span class="value final-value" id="final-amount">0원</span>
+                </div>
+
+                <div class="divider" style="margin: 1.5rem 0;"></div>
+
+                <div class="result-row final">
+                    <span class="label">SK 일렉링크 충전액<br><span style="font-size: 0.85em; opacity: 0.8;">(5%
+                            선할인)</span></span>
+                    <div class="result-right-group">
+                        <button class="copy-btn special" onclick="copyToClipboard('required-payment-sk')">복사</button>
+                        <span class="value final-value" id="required-payment-sk">0원</span>
+                    </div>
                 </div>
             </div>
 
@@ -433,13 +421,12 @@
     </div>
 
     <script>
-        const amountInput = document.getElementById('amount');
+        const limitInput = document.getElementById('limit-amount');
+        const requiredPaymentDisplay = document.getElementById('required-payment');
+        const requiredPaymentSkDisplay = document.getElementById('required-payment-sk');
         const discountDisplay = document.getElementById('discount-amount');
         const finalDisplay = document.getElementById('final-amount');
-        const maxBadge = document.getElementById('max-badge');
         const rateLabel = document.getElementById('rate-label');
-        const infoMaxLimit = document.querySelector('.info-highlight:first-child');
-        const infoRate = document.querySelectorAll('.info-highlight')[1];
 
         // Default values
         let MAX_DISCOUNT = 30000;
@@ -453,19 +440,14 @@
                 if (e.target.value === '70') {
                     MAX_DISCOUNT = 30000;
                     DISCOUNT_RATE = 0.70;
-                    rateLabel.textContent = '적용 할인율 (70%)';
-                    // Update Info Text
                     document.querySelector('.info-text').innerHTML =
                         '최대 할인 한도 <span class="info-highlight">30,000원</span>까지<br><span class="info-highlight">70%</span> 할인이 적용됩니다.';
                 } else {
                     MAX_DISCOUNT = 20000;
                     DISCOUNT_RATE = 0.50;
-                    rateLabel.textContent = '적용 할인율 (50%)';
                     document.querySelector('.info-text').innerHTML =
                         '최대 할인 한도 <span class="info-highlight">20,000원</span>까지<br><span class="info-highlight">50%</span> 할인이 적용됩니다.';
                 }
-                // Recalculate both
-                calculate();
                 calculateReverse();
             });
         });
@@ -477,78 +459,6 @@
         function parseNumber(str) {
             return parseInt(str.replace(/,/g, ''), 10) || 0;
         }
-
-        function calculate() {
-            const rawValue = parseNumber(amountInput.value);
-
-            let calculatedDiscount = Math.floor(rawValue * DISCOUNT_RATE);
-
-            // Auto-correct logic
-            // If discount exceeds MAX_DISCOUNT, snap input to the exact amount that gives MAX_DISCOUNT
-            if (calculatedDiscount > MAX_DISCOUNT) {
-                // Reverse calc: Amount = MaxDiscount / Rate
-                // slightly simplified: we need the smallest integer that results in >= 30000 ? 
-                // Or just the threshold? User said "max discount... fix input to that amount"
-                // 30000 / 0.7 = 42857.14... -> 42858 gives 30000.6 -> floor -> 30000
-
-                const optimalAmount = Math.ceil(MAX_DISCOUNT / DISCOUNT_RATE);
-
-                // Only update if current value is clearly larger than optimal (to avoid fighting rounding flickers, though integer input prevents most)
-                if (rawValue > optimalAmount) {
-                    amountInput.value = formatNumber(optimalAmount);
-                    // Recalculate based on new value
-                    calculatedDiscount = Math.floor(optimalAmount * DISCOUNT_RATE);
-                }
-            }
-
-            let actualDiscount = calculatedDiscount;
-            let isMaxed = false;
-
-            if (calculatedDiscount >= MAX_DISCOUNT) {
-                actualDiscount = MAX_DISCOUNT;
-                isMaxed = true;
-            }
-
-            // Additional cleanup: if we auto-corrected, we are technically AT the max.
-            // But the previous condition `calculatedDiscount >= MAX_DISCOUNT` covers it.
-
-            const finalPay = parseNumber(amountInput.value) - actualDiscount;
-
-            // Update UI
-            discountDisplay.textContent = `-${formatNumber(actualDiscount)}원`;
-            finalDisplay.textContent = `${formatNumber(finalPay)}원`;
-
-            // Handle Badge
-            if (isMaxed) {
-                maxBadge.classList.add('visible');
-                maxBadge.textContent = '최대 할인 한도 적용 (자동 수정됨)';
-                maxBadge.classList.remove('badge-optimal');
-                maxBadge.classList.add('badge-max');
-            } else {
-                maxBadge.classList.remove('visible');
-            }
-        }
-
-        amountInput.addEventListener('input', (e) => {
-            // Format input with commas
-            let value = e.target.value.replace(/[^0-9]/g, '');
-            if (value) {
-                e.target.value = formatNumber(parseInt(value, 10));
-            } else {
-                e.target.value = '';
-            }
-
-            calculate();
-        });
-
-        // Initial run
-        calculate();
-
-
-        // --- Reverse Calculator Logic ---
-        const limitInput = document.getElementById('limit-amount');
-        const requiredPaymentDisplay = document.getElementById('required-payment');
-        const requiredPaymentSkDisplay = document.getElementById('required-payment-sk');
 
         function calculateReverse() {
             let rawLimit = parseNumber(limitInput.value);
@@ -562,19 +472,31 @@
             if (rawLimit <= 0) {
                 requiredPaymentDisplay.textContent = '0원';
                 requiredPaymentSkDisplay.textContent = '0원';
+                discountDisplay.textContent = '0원';
+                finalDisplay.textContent = '0원';
                 return;
             }
 
             // 1. Standard Requirement
+            // We want Discount = rawLimit
+            // Discount = floor(Total * Rate)
+            // So Total >= rawLimit / Rate
             const requiredPayment = Math.ceil(rawLimit / DISCOUNT_RATE);
 
             // 2. SK ElecLink Requirement (5% pre-discount)
-            // We need (InputAmount * 0.95) >= requiredPayment
-            // InputAmount >= requiredPayment / 0.95
             const requiredSkAmount = Math.ceil(requiredPayment / 0.95);
+
+            // 3. Display Breakdown
+            // Verify Discount with calculated payment
+            // In optimization mode, the Discount is basically the Limit user entered.
+            // But let's calculate truthfully from the required payment.
+            const actualDiscount = Math.floor(requiredPayment * DISCOUNT_RATE);
+            const finalPay = requiredPayment - actualDiscount;
 
             requiredPaymentDisplay.textContent = `${formatNumber(requiredPayment)}원`;
             requiredPaymentSkDisplay.textContent = `${formatNumber(requiredSkAmount)}원`;
+            discountDisplay.textContent = `-${formatNumber(actualDiscount)}원`;
+            finalDisplay.textContent = `${formatNumber(finalPay)}원`;
         }
 
         limitInput.addEventListener('input', (e) => {
@@ -586,6 +508,10 @@
             }
             calculateReverse();
         });
+
+        // Initial
+        calculateReverse();
+
 
         // Copy Function
         function copyToClipboard(elementId) {
