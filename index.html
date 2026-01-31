@@ -325,6 +325,31 @@
                 </label>
             </div>
 
+            <div class="section-title">남은 한도 최적 결제액 계산</div>
+
+            <div class="input-group">
+                <label for="limit-amount">남은 카드 할인 한도</label>
+                <div class="input-wrapper">
+                    <input type="text" id="limit-amount" inputmode="numeric">
+                </div>
+            </div>
+
+            <div class="results">
+                <div class="result-row">
+                    <span class="label">결제 필요 금액 (일반)</span>
+                    <span class="value" id="required-payment">0원</span>
+                </div>
+                <div class="result-row final">
+                    <span class="label">SK 일렉링크 충전액<br><span style="font-size: 0.85em; opacity: 0.8;">(5%
+                            선할인)</span></span>
+                    <span class="value final-value" id="required-payment-sk">0원</span>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="section-title">할인 금액 계산</div>
+
             <div class="input-group">
                 <label for="amount">결제 금액을 입력하세요</label>
                 <div class="input-wrapper">
@@ -345,29 +370,6 @@
                 <div class="result-row final">
                     <span class="label">최종 결제 금액</span>
                     <span class="value final-value" id="final-amount">0원</span>
-                </div>
-            </div>
-
-            <div class="divider"></div>
-
-            <div class="section-title">남은 한도 최적 결제액 계산</div>
-
-            <div class="input-group">
-                <label for="limit-amount">남은 카드 할인 한도</label>
-                <div class="input-wrapper">
-                    <input type="text" id="limit-amount" inputmode="numeric">
-                </div>
-            </div>
-
-            <div class="results">
-                <div class="result-row">
-                    <span class="label">결제 필요 금액 (일반)</span>
-                    <span class="value" id="required-payment">0원</span>
-                </div>
-                <div class="result-row final">
-                    <span class="label">SK 일렉링크 충전액<br><span style="font-size: 0.85em; opacity: 0.8;">(5%
-                            선할인)</span></span>
-                    <span class="value final-value" id="required-payment-sk">0원</span>
                 </div>
             </div>
 
