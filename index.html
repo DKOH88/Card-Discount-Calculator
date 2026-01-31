@@ -497,7 +497,13 @@
         const requiredPaymentSkDisplay = document.getElementById('required-payment-sk');
 
         function calculateReverse() {
-            const rawLimit = parseNumber(limitInput.value);
+            let rawLimit = parseNumber(limitInput.value);
+
+            // Auto-correct limit input (Cap at MAX_DISCOUNT)
+            if (rawLimit > MAX_DISCOUNT) {
+                rawLimit = MAX_DISCOUNT;
+                limitInput.value = formatNumber(rawLimit);
+            }
 
             if (rawLimit <= 0) {
                 requiredPaymentDisplay.textContent = '0원';
