@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Discount Calculator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Outfit:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f1115;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --accent-primary: #8b5cf6;
+            /* Violet */
+            --accent-secondary: #ec4899;
+            /* Pink */
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 40%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 580px;
+            /* Increased by 100px from 480px */
+            padding: 2rem;
+        }
+
+        .calculator-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Ambient glow effect */
+        .calculator-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: transparent;
+            z-index: -1;
+        }
+
+        .creator-tag {
+            text-align: center;
+            color: var(--accent-primary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 2rem;
+            opacity: 0.7;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            letter-spacing: -0.02em;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            color: var(--text-main);
+            margin-bottom: 1rem;
+            margin-top: 2rem;
+            font-weight: 600;
+            border-left: 4px solid var(--accent-primary);
+            padding-left: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.75rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.25rem 1.25rem 1.25rem 1rem;
+            font-size: 1.5rem;
+            color: #fff;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: right;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+        }
+
+        .currency-symbol {
+            position: absolute;
+            right: 1.5rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            pointer-events: none;
+        }
+
+        .results {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .result-row.final {
+            border-bottom: none;
+            margin-top: 1rem;
+            padding-top: 1.5rem;
+            border-top: 1px dashed rgba(255, 255, 255, 0.15);
+        }
+
+        .label {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .discount-value {
+            color: var(--accent-secondary);
+        }
+
+        .final-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .badge {
+            display: none;
+            /* Changed from inline-flex to none to prevent layout shift */
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+            /* Removed opacity transition for alignment stability */
+        }
+
+        .badge.visible {
+            display: inline-flex;
+            /* opacity logic removed */
+        }
+
+        .badge-max {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .badge-optimal {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent);
+            margin: 2.5rem 0;
+        }
+
+        .info-text {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .info-highlight {
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="calculator-card">
+            <h1>카드 할인 계산기</h1>
+
+            <div class="input-group">
+                <label for="amount">결제 금액을 입력하세요</label>
+                <div class="input-wrapper">
+                    <input type="text" id="amount" placeholder="0" inputmode="numeric" autofocus>
+                </div>
+            </div>
+
+            <div class="results">
+                <div class="result-row">
+                    <span class="label">적용 할인율 (70%)</span>
+                    <div style="display: flex; align-items: center;">
+                        <span class="value discount-value" id="discount-amount">0원</span>
+                        <span id="max-badge" class="badge badge-max">최대 한도 도달</span>
+                    </div>
+                </div>
+
+                <div class="result-row final">
+                    <span class="label">최종 결제 금액</span>
+                    <span class="value final-value" id="final-amount">0원</span>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="section-title">남은 한도 최적 결제액 계산</div>
+
+            <div class="input-group">
+                <label for="limit-amount">남은 카드 할인 한도</label>
+                <div class="input-wrapper">
+                    <input type="text" id="limit-amount" inputmode="numeric">
+                </div>
+            </div>
+
+            <div class="results">
+                <div class="result-row">
+                    <span class="label">결제 필요 금액 (일반)</span>
+                    <span class="value" id="required-payment">0원</span>
+                </div>
+                <div class="result-row final">
+                    <span class="label">SK 일렉링크 충전액 (5% 선할인)</span>
+                    <span class="value final-value" id="required-payment-sk">0원</span>
+                </div>
+            </div>
+
+            <div class="info-text">
+                최대 할인 한도 <span class="info-highlight">30,000원</span>까지<br>
+                <span class="info-highlight">70%</span> 할인이 적용됩니다.
+            </div>
+
+            <div class="creator-tag">Created by 청주T Plus With TKC</div>
+        </div>
+    </div>
+
+    <script>
+        const amountInput = document.getElementById('amount');
+        const discountDisplay = document.getElementById('discount-amount');
+        const finalDisplay = document.getElementById('final-amount');
+        const maxBadge = document.getElementById('max-badge');
+
+        const MAX_DISCOUNT = 30000;
+        const DISCOUNT_RATE = 0.70;
+
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function parseNumber(str) {
+            return parseInt(str.replace(/,/g, ''), 10) || 0;
+        }
+
+        function calculate() {
+            const rawValue = parseNumber(amountInput.value);
+
+            let calculatedDiscount = Math.floor(rawValue * DISCOUNT_RATE);
+
+            // Auto-correct logic
+            // If discount exceeds MAX_DISCOUNT, snap input to the exact amount that gives MAX_DISCOUNT
+            if (calculatedDiscount > MAX_DISCOUNT) {
+                // Reverse calc: Amount = MaxDiscount / Rate
+                // slightly simplified: we need the smallest integer that results in >= 30000 ? 
+                // Or just the threshold? User said "max discount... fix input to that amount"
+                // 30000 / 0.7 = 42857.14... -> 42858 gives 30000.6 -> floor -> 30000
+
+                const optimalAmount = Math.ceil(MAX_DISCOUNT / DISCOUNT_RATE);
+
+                // Only update if current value is clearly larger than optimal (to avoid fighting rounding flickers, though integer input prevents most)
+                if (rawValue > optimalAmount) {
+                    amountInput.value = formatNumber(optimalAmount);
+                    // Recalculate based on new value
+                    calculatedDiscount = Math.floor(optimalAmount * DISCOUNT_RATE);
+                }
+            }
+
+            let actualDiscount = calculatedDiscount;
+            let isMaxed = false;
+
+            if (calculatedDiscount >= MAX_DISCOUNT) {
+                actualDiscount = MAX_DISCOUNT;
+                isMaxed = true;
+            }
+
+            // Additional cleanup: if we auto-corrected, we are technically AT the max.
+            // But the previous condition `calculatedDiscount >= MAX_DISCOUNT` covers it.
+
+            const finalPay = parseNumber(amountInput.value) - actualDiscount;
+
+            // Update UI
+            discountDisplay.textContent = `-${formatNumber(actualDiscount)}원`;
+            finalDisplay.textContent = `${formatNumber(finalPay)}원`;
+
+            // Handle Badge
+            if (isMaxed) {
+                maxBadge.classList.add('visible');
+                maxBadge.textContent = '최대 할인 한도 적용 (자동 수정됨)';
+                maxBadge.classList.remove('badge-optimal');
+                maxBadge.classList.add('badge-max');
+            } else {
+                maxBadge.classList.remove('visible');
+            }
+        }
+
+        amountInput.addEventListener('input', (e) => {
+            // Format input with commas
+            let value = e.target.value.replace(/[^0-9]/g, '');
+            if (value) {
+                e.target.value = formatNumber(parseInt(value, 10));
+            } else {
+                e.target.value = '';
+            }
+
+            calculate();
+        });
+
+        // Initial run
+        calculate();
+
+
+        // --- Reverse Calculator Logic ---
+        const limitInput = document.getElementById('limit-amount');
+        const requiredPaymentDisplay = document.getElementById('required-payment');
+        const requiredPaymentSkDisplay = document.getElementById('required-payment-sk');
+
+        function calculateReverse() {
+            const rawLimit = parseNumber(limitInput.value);
+
+            if (rawLimit <= 0) {
+                requiredPaymentDisplay.textContent = '0원';
+                requiredPaymentSkDisplay.textContent = '0원';
+                return;
+            }
+
+            // 1. Standard Requirement
+            const requiredPayment = Math.ceil(rawLimit / DISCOUNT_RATE);
+
+            // 2. SK ElecLink Requirement (5% pre-discount)
+            // We need (InputAmount * 0.95) >= requiredPayment
+            // InputAmount >= requiredPayment / 0.95
+            const requiredSkAmount = Math.ceil(requiredPayment / 0.95);
+
+            requiredPaymentDisplay.textContent = `${formatNumber(requiredPayment)}원`;
+            requiredPaymentSkDisplay.textContent = `${formatNumber(requiredSkAmount)}원`;
+        }
+
+        limitInput.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/[^0-9]/g, '');
+            if (value) {
+                e.target.value = formatNumber(parseInt(value, 10));
+            } else {
+                e.target.value = '';
+            }
+            calculateReverse();
+        });
+    </script>
+
+</body>
+
+</html>
