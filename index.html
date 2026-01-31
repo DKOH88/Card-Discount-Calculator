@@ -379,6 +379,7 @@
             </div>
 
             <div class="results">
+                <!-- Block 1: Discounts & SK -->
                 <div class="result-row">
                     <div style="display: flex; flex-direction: column;">
                         <span class="label" id="rate-label">삼성카드 할인금액</span>
@@ -386,9 +387,30 @@
                     <span class="value discount-value" id="discount-amount">0원</span>
                 </div>
 
-                <div class="divider" style="margin: 1rem 0; opacity: 0.3;"></div>
+                <div class="result-row">
+                    <span class="label">SK일렉링크 결제 시 설정금액</span>
+                    <div class="result-right-group">
+                        <button class="copy-btn special" onclick="copyToClipboard('required-payment-sk')">복사</button>
+                        <span class="value final-value" id="required-payment-sk">0원</span>
+                    </div>
+                </div>
 
-                <!-- General Section -->
+                <div class="result-row">
+                    <span class="label" style="opacity: 0.8;">SK일렉링크 할인금액<br><span
+                            style="font-size: 0.85em; opacity: 0.8;">(5%할인 적용된 금액표기)</span></span>
+                    <span class="value" id="sk-discount-amount"
+                        style="color: var(--accent-secondary); opacity: 0.9;">0원</span>
+                </div>
+
+                <div class="result-row final">
+                    <span class="label">SK일렉링크 결제 시 최종 승인금액</span>
+                    <span class="value final-value" id="final-amount-sk"
+                        style="color: var(--accent-secondary);">0원</span>
+                </div>
+
+                <div class="divider" style="margin: 1.5rem 0; opacity: 0.5;"></div>
+
+                <!-- Block 2: General/Samsung -->
                 <div class="result-row">
                     <span class="label">삼성카드 할인만 적용 시 설정 금액</span>
                     <div class="result-right-group">
@@ -397,27 +419,9 @@
                     </div>
                 </div>
 
-                <div class="divider" style="margin: 1.5rem 0; opacity: 0.5;"></div>
-
-                <!-- SK Section -->
-                <div class="result-row">
-                    <span class="label">SK일렉링크 결제 시 설정금액<br><span style="font-size: 0.85em; opacity: 0.8;">(5%
-                            선할인)</span></span>
-                    <div class="result-right-group">
-                        <button class="copy-btn special" onclick="copyToClipboard('required-payment-sk')">복사</button>
-                        <span class="value final-value" id="required-payment-sk">0원</span>
-                    </div>
-                </div>
-
                 <div class="result-row final">
                     <span class="label">삼성할인만 적용 시 최종 승인금액</span>
                     <span class="value final-value" id="final-amount" style="color: #fff;">0원</span>
-                </div>
-
-                <div class="result-row final">
-                    <span class="label">SK일렉링크 결제 시 최종 승인금액</span>
-                    <span class="value final-value" id="final-amount-sk"
-                        style="color: var(--accent-secondary);">0원</span>
                 </div>
             </div>
 
@@ -434,6 +438,7 @@
         const limitInput = document.getElementById('limit-amount');
         const requiredPaymentDisplay = document.getElementById('required-payment');
         const requiredPaymentSkDisplay = document.getElementById('required-payment-sk');
+        const skDiscountDisplay = document.getElementById('sk-discount-amount');
         const discountDisplay = document.getElementById('discount-amount');
         const finalDisplay = document.getElementById('final-amount');
         const finalSkDisplay = document.getElementById('final-amount-sk');
@@ -483,6 +488,7 @@
             if (rawLimit <= 0) {
                 requiredPaymentDisplay.textContent = '0원';
                 requiredPaymentSkDisplay.textContent = '0원';
+                skDiscountDisplay.textContent = '0원';
                 discountDisplay.textContent = '0원';
                 finalDisplay.textContent = '0원';
                 finalSkDisplay.textContent = '0원';
@@ -497,6 +503,7 @@
 
             // 2. SK ElecLink Requirement (5% pre-discount)
             const requiredSkAmount = Math.ceil(requiredPayment / 0.95);
+            const skDiscountAmount = requiredSkAmount - requiredPayment;
             // SK Final Payment is logically the same as General Final Payment
             // Because card discount applies to the billed amount (which is requiredPayment)
             // But let's verify:
@@ -512,6 +519,7 @@
 
             requiredPaymentDisplay.textContent = `${formatNumber(requiredPayment)}원`;
             requiredPaymentSkDisplay.textContent = `${formatNumber(requiredSkAmount)}원`;
+            skDiscountDisplay.textContent = `-${formatNumber(skDiscountAmount)}원`;
             discountDisplay.textContent = `-${formatNumber(actualDiscount)}원`;
             finalDisplay.textContent = `${formatNumber(finalPay)}원`;
             finalSkDisplay.textContent = `${formatNumber(finalPay)}원`;
