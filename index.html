@@ -421,7 +421,8 @@
 
                 <div class="result-row final">
                     <span class="label">삼성할인만 적용 시 최종 승인금액</span>
-                    <span class="value final-value" id="final-amount" style="color: #fff;">0원</span>
+                    <span class="value final-value" id="final-amount"
+                        style="color: #fff; -webkit-text-fill-color: initial; background: none;">0원</span>
                 </div>
             </div>
 
@@ -546,8 +547,13 @@
 
             discountDisplay.textContent = `-${formatNumber(actualDiscountGeneral)}원`;
 
-            finalDisplay.textContent = `${formatNumber(finalGeneral)}원`;
-            finalSkDisplay.textContent = `${formatNumber(finalGeneral)}원`; // Math is same.
+            // Samsung Only Final: The amount without the 5% SK discount (higher amount)
+            // i.e. finalGeneral (12,858) + skDiscountAmount (2,256)
+            const finalSamsungWithLostDiscount = finalGeneral + skDiscountAmount;
+            finalDisplay.textContent = `${formatNumber(finalSamsungWithLostDiscount)}원`;
+
+            // SK ElecLink Final: The optimal low amount
+            finalSkDisplay.textContent = `${formatNumber(finalGeneral)}원`;
         }
 
         limitInput.addEventListener('input', (e) => {
