@@ -305,6 +305,50 @@
             font-size: 0.95rem;
             font-weight: 500;
         }
+
+        .option-text {
+            color: var(--text-main);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* Copy Button Styles */
+        .copy-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-muted);
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-right: 0.8rem;
+        }
+
+        .copy-btn:hover {
+            border-color: var(--text-main);
+            color: var(--text-main);
+        }
+
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+
+        .copy-btn.special {
+            border-color: rgba(236, 72, 153, 0.5);
+            color: var(--accent-secondary);
+            background: rgba(236, 72, 153, 0.1);
+        }
+
+        .copy-btn.special:hover {
+            background: rgba(236, 72, 153, 0.2);
+            box-shadow: 0 0 8px rgba(236, 72, 153, 0.3);
+        }
+
+        .result-right-group {
+            display: flex;
+            align-items: center;
+        }
     </style>
 </head>
 
@@ -337,12 +381,18 @@
             <div class="results">
                 <div class="result-row">
                     <span class="label">결제 필요 금액 (일반)</span>
-                    <span class="value" id="required-payment">0원</span>
+                    <div class="result-right-group">
+                        <button class="copy-btn" onclick="copyToClipboard('required-payment')">복사</button>
+                        <span class="value" id="required-payment">0원</span>
+                    </div>
                 </div>
                 <div class="result-row final">
                     <span class="label">SK 일렉링크 충전액<br><span style="font-size: 0.85em; opacity: 0.8;">(5%
                             선할인)</span></span>
-                    <span class="value final-value" id="required-payment-sk">0원</span>
+                    <div class="result-right-group">
+                        <button class="copy-btn special" onclick="copyToClipboard('required-payment-sk')">복사</button>
+                        <span class="value final-value" id="required-payment-sk">0원</span>
+                    </div>
                 </div>
             </div>
 
@@ -536,6 +586,28 @@
             }
             calculateReverse();
         });
+
+        // Copy Function
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const textToCopy = element.innerText.replace('원', '').replace(/,/g, ''); // Copy raw number only? Or formatted? User said "amount numbers".
+            // Let's copy the number only "35432" based on "amount numbers". If they need format, I'll change it. 
+            // Actually usually for bank apps/inputs you want raw digits.
+            // But wait, the previous code used formatted numbers for display.
+            // Let's copy ONLY digits.
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                // Optional: Feedback?
+                const btn = element.previousElementSibling;
+                const originalText = btn.innerText;
+                btn.innerText = "완료";
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                }, 1500);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
     </script>
 
 </body>
