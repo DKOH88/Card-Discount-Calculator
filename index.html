@@ -499,36 +499,24 @@
             // We want Discount = rawLimit
             // Discount = floor(Total * Rate)
             // So Total >= rawLimit / Rate
-            // 1. Calculate Targets
-            // We want Discount = rawLimit
-            // So Billed Amount Must Be >= rawLimit / Rate
-            const billedTarget = Math.ceil(rawLimit / DISCOUNT_RATE);
+            const requiredPayment = Math.ceil(rawLimit / DISCOUNT_RATE);
 
             // 2. SK ElecLink Requirement (5% pre-discount)
-            // SK Setup Amount is what we type in the app.
-            // SK Setup * 0.95 = Billed Target
-            const requiredSkAmount = Math.ceil(billedTarget / 0.95);
-            const skDiscountAmount = requiredSkAmount - billedTarget;
+            const requiredSkAmount = Math.ceil(requiredPayment / 0.95);
+            const skDiscountAmount = requiredSkAmount - requiredPayment;
+            // SK Final Payment is logically the same as General Final Payment
+            // Because card discount applies to the billed amount (which is requiredPayment)
+            // But let's verify:
+            // User pays requiredSkAmount, gets 5% off => Billed requiredPayment.
+            // Card gives limit discount.
+            // Net Cost = (requiredSkAmount - (requiredSkAmount * 0.05)) - Discount? 
+            // = requiredPayment - ActualDiscount.
+            // So yes, identical.
 
-            // 3. Samsung/General Requirement (Comparison Mode)
-            // User wants to see: "If I paid the SAME Setup Amount at a General Merchant, what is the cost?"
-            // So Samsung Setup = SK Setup Amount
-            const requiredGeneralSetup = requiredSkAmount;
-
-            // 4. Final Calculations
-
-            // SK Final
-            // Billed: billedTarget
-            // Discount: floor(billedTarget * RATE) -> Should be close to rawLimit
-            const actualDiscountSk = Math.floor(billedTarget * DISCOUNT_RATE);
-            const finalSk = billedTarget - actualDiscountSk;
-
-            // General Final
-            // Billed: requiredGeneralSetup (No 5% discount)
-            // Discount: floor(requiredGeneralSetup * RATE)
-            // BUT: Discount cannot exceed rawLimit (User Input).
-            const actualDiscountGeneral = rawLimit;
-            const finalGeneral = requiredGeneralSetup - actualDiscountGeneral;
+            // 3. Display Breakdown
+            // General Calculation
+            const actualDiscountGeneral = Math.floor(requiredPayment * DISCOUNT_RATE);
+            const finalGeneral = requiredPayment - actualDiscountGeneral;
 
             // SK Calculation (Verify logic independent of General)
             // SK Charge = requiredSkAmount
