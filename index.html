@@ -381,7 +381,7 @@
             <div class="results">
                 <div class="result-row">
                     <div style="display: flex; flex-direction: column;">
-                        <span class="label" id="rate-label">적용 할인 금액 (최대)</span>
+                        <span class="label" id="rate-label">삼성카드 할인금액</span>
                     </div>
                     <span class="value discount-value" id="discount-amount">0원</span>
                 </div>
@@ -390,7 +390,7 @@
 
                 <!-- General Section -->
                 <div class="result-row">
-                    <span class="label">결제 필요 금액 (일반)</span>
+                    <span class="label">삼성카드 할인만 적용 시 설정 금액</span>
                     <div class="result-right-group">
                         <button class="copy-btn" onclick="copyToClipboard('required-payment')">복사</button>
                         <span class="value" id="required-payment">0원</span>
@@ -401,7 +401,7 @@
 
                 <!-- SK Section -->
                 <div class="result-row">
-                    <span class="label">SK 일렉링크 충전액<br><span style="font-size: 0.85em; opacity: 0.8;">(5%
+                    <span class="label">SK일렉링크 결제 시 설정금액<br><span style="font-size: 0.85em; opacity: 0.8;">(5%
                             선할인)</span></span>
                     <div class="result-right-group">
                         <button class="copy-btn special" onclick="copyToClipboard('required-payment-sk')">복사</button>
@@ -410,12 +410,12 @@
                 </div>
 
                 <div class="result-row final">
-                    <span class="label">최종 결제 금액 (일반)</span>
+                    <span class="label">삼성할인만 적용 시 최종 승인금액</span>
                     <span class="value final-value" id="final-amount" style="color: #fff;">0원</span>
                 </div>
 
                 <div class="result-row final">
-                    <span class="label">최종 결제 금액 (SK 일렉링크)</span>
+                    <span class="label">SK일렉링크 결제 시 최종 승인금액</span>
                     <span class="value final-value" id="final-amount-sk"
                         style="color: var(--accent-secondary);">0원</span>
                 </div>
