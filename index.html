@@ -367,6 +367,10 @@
                     <input type="radio" name="discount-option" value="50">
                     <span class="option-text">적용 할인율 (50%) - 2만원 한도</span>
                 </label>
+                <label class="option-label">
+                    <input type="radio" name="discount-option" value="30">
+                    <span class="option-text">적용 할인율 (30%) - 2만원 한도</span>
+                </label>
             </div>
 
             <div class="section-title">남은 한도 최적 결제액 계산</div>
@@ -382,7 +386,7 @@
                 <!-- Block 1: Discounts & SK -->
                 <div class="result-row">
                     <div style="display: flex; flex-direction: column;">
-                        <span class="label" id="rate-label">삼성카드 할인금액</span>
+                        <span class="label" id="rate-label">삼성or신한카드 할인금액</span>
                     </div>
                     <span class="value discount-value" id="discount-amount">0원</span>
                 </div>
@@ -412,7 +416,7 @@
 
                 <!-- Block 2: General/Samsung -->
                 <div class="result-row">
-                    <span class="label">삼성카드 할인만 적용 시<br>설정 금액</span>
+                    <span class="label">카드할인만 적용 시<br>설정 금액</span>
                     <div class="result-right-group">
                         <button class="copy-btn" onclick="copyToClipboard('required-payment')">복사</button>
                         <span class="value" id="required-payment">0원</span>
@@ -420,7 +424,7 @@
                 </div>
 
                 <div class="result-row final">
-                    <span class="label">삼성카드 할인만 적용 시<br>최종 승인금액</span>
+                    <span class="label">카드할인만 적용 시<br>최종 승인금액</span>
                     <span class="value final-value" id="final-amount"
                         style="color: #fff; -webkit-text-fill-color: initial; background: none;">0원</span>
                 </div>
@@ -459,11 +463,16 @@
                     DISCOUNT_RATE = 0.70;
                     document.querySelector('.info-text').innerHTML =
                         '최대 할인 한도 <span class="info-highlight">30,000원</span>까지<br><span class="info-highlight">70%</span> 할인이 적용됩니다.';
-                } else {
+                } else if (e.target.value === '50') {
                     MAX_DISCOUNT = 20000;
                     DISCOUNT_RATE = 0.50;
                     document.querySelector('.info-text').innerHTML =
                         '최대 할인 한도 <span class="info-highlight">20,000원</span>까지<br><span class="info-highlight">50%</span> 할인이 적용됩니다.';
+                } else {
+                    MAX_DISCOUNT = 20000;
+                    DISCOUNT_RATE = 0.30;
+                    document.querySelector('.info-text').innerHTML =
+                        '최대 할인 한도 <span class="info-highlight">20,000원</span>까지<br><span class="info-highlight">30%</span> 할인이 적용됩니다.';
                 }
                 calculateReverse();
             });
